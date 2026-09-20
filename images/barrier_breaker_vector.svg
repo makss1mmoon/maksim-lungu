@@ -1,0 +1,210 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#12131C"/>
+      <stop offset="50%" stop-color="#0E0F17"/>
+      <stop offset="100%" stop-color="#141522"/>
+    </linearGradient>
+    <linearGradient id="redAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF1744"/>
+      <stop offset="100%" stop-color="#FF5252"/>
+    </linearGradient>
+    <linearGradient id="greenAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00E676"/>
+      <stop offset="100%" stop-color="#00B0FF"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1A1C28" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#12131D" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="glowRed" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="glowGreen" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <style>
+    .title-sub { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 2px; fill: #8E92A8; text-transform: uppercase; }
+    .card-tag { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 1px; fill: #FF5252; text-transform: uppercase; }
+    .card-strike { font-family: 'Inter', 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; fill: #7E8299; text-decoration: line-through; }
+    .card-solution { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 14px; font-weight: 800; fill: #00E676; }
+    .card-desc { font-family: 'Inter', 'Segoe UI', sans-serif; font-size: 11.5px; font-weight: 500; fill: #B5B8CD; line-height: 1.4; }
+    .status-badge { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 12px; font-weight: 800; fill: #00E676; }
+  </style>
+
+  <!-- Background Canvas -->
+  <rect x="2" y="2" width="996" height="316" rx="20" fill="url(#bgGrad)" stroke="#262838" stroke-width="1.5"/>
+  
+  <!-- Subtle Grid Dots -->
+  <g opacity="0.15">
+    <circle cx="80" cy="50" r="1.5" fill="#FFF"/><circle cx="160" cy="50" r="1.5" fill="#FFF"/><circle cx="240" cy="50" r="1.5" fill="#FFF"/><circle cx="320" cy="50" r="1.5" fill="#FFF"/>
+    <circle cx="400" cy="50" r="1.5" fill="#FFF"/><circle cx="480" cy="50" r="1.5" fill="#FFF"/><circle cx="560" cy="50" r="1.5" fill="#FFF"/><circle cx="640" cy="50" r="1.5" fill="#FFF"/>
+    <circle cx="720" cy="50" r="1.5" fill="#FFF"/><circle cx="800" cy="50" r="1.5" fill="#FFF"/><circle cx="880" cy="50" r="1.5" fill="#FFF"/><circle cx="960" cy="50" r="1.5" fill="#FFF"/>
+  </g>
+
+  <!-- Top Status Bar -->
+  <g transform="translate(30, 24)">
+    <circle cx="6" cy="6" r="4" fill="#00E676" filter="url(#glowGreen)"/>
+    <text x="20" y="10" class="title-sub">СИСТЕМА НЕЙТРАЛИЗАЦИИ БАРЬЕРОВ ПОСТУПЛЕНИЯ</text>
+    
+    <!-- Right Status Pill -->
+    <g transform="translate(710, -8)">
+      <rect width="230" height="28" rx="14" fill="#00E676" fill-opacity="0.1" stroke="#00E676" stroke-opacity="0.3" stroke-width="1"/>
+      <circle cx="16" cy="14" r="4" fill="#00E676"/>
+      <text x="30" y="18" class="status-badge">4 ИЗ 4 БАРЬЕРОВ СНЯТЫ ✓</text>
+    </g>
+  </g>
+
+  <!-- Horizontal Glow Divider Line -->
+  <line x1="30" y1="52" x2="970" y2="52" stroke="#262838" stroke-width="1"/>
+
+  <!-- CARD 1: Low Exam Scores -->
+  <g transform="translate(30, 68)">
+    <rect width="220" height="225" rx="14" fill="url(#cardGrad)" stroke="#262838" stroke-width="1"/>
+    <!-- Top accent bar -->
+    <rect x="0" y="0" width="220" height="3" rx="1.5" fill="url(#redAccent)"/>
+    
+    <g transform="translate(18, 22)">
+      <text x="0" y="0" class="card-tag">БАЛЛЫ ЕГЭ / ОГЭ</text>
+      
+      <!-- Problem -->
+      <g transform="translate(0, 22)">
+        <text x="0" y="0" class="card-strike">✕ Низкий балл или завал</text>
+      </g>
+      
+      <!-- Arrow down -->
+      <path d="M10 32 L10 46 M6 42 L10 47 L14 42" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- Solution -->
+      <g transform="translate(0, 66)">
+        <rect x="-4" y="-14" width="190" height="28" rx="6" fill="#00E676" fill-opacity="0.12"/>
+        <text x="6" y="5" class="card-solution">БЕЗ ЕГЭ И ОГЭ</text>
+      </g>
+
+      <!-- Description -->
+      <text x="0" y="105" class="card-desc">
+        <tspan x="0" dy="0">Поступление в колледж по</tspan>
+        <tspan x="0" dy="16">аттестату, а затем в вуз</tspan>
+        <tspan x="0" dy="16">по внутренним тестам.</tspan>
+      </text>
+
+      <!-- Checkmark tag -->
+      <g transform="translate(0, 155)">
+        <rect width="90" height="22" rx="11" fill="#00E676" fill-opacity="0.15" stroke="#00E676" stroke-width="1"/>
+        <text x="12" y="15" font-family="'Outfit', sans-serif" font-size="10" font-weight="700" fill="#00E676">100% ВХОД</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- CARD 2: Tuition Cost -->
+  <g transform="translate(270, 68)">
+    <rect width="220" height="225" rx="14" fill="url(#cardGrad)" stroke="#262838" stroke-width="1"/>
+    <rect x="0" y="0" width="220" height="3" rx="1.5" fill="url(#redAccent)"/>
+    
+    <g transform="translate(18, 22)">
+      <text x="0" y="0" class="card-tag">СТОИМОСТЬ УЧЕБЫ</text>
+      
+      <!-- Problem -->
+      <g transform="translate(0, 22)">
+        <text x="0" y="0" class="card-strike">✕ Дорого / Кредиты банков</text>
+      </g>
+      
+      <!-- Arrow down -->
+      <path d="M10 32 L10 46 M6 42 L10 47 L14 42" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- Solution -->
+      <g transform="translate(0, 66)">
+        <rect x="-4" y="-14" width="190" height="28" rx="6" fill="#00E676" fill-opacity="0.12"/>
+        <text x="6" y="5" class="card-solution">СКИДКА ДО 30% + 0%</text>
+      </g>
+
+      <!-- Description -->
+      <text x="0" y="105" class="card-desc">
+        <tspan x="0" dy="0">Прямая рассрочка от вуза</tspan>
+        <tspan x="0" dy="16">без процентов и банков +</tspan>
+        <tspan x="0" dy="16">оплата маткапиталом.</tspan>
+      </text>
+
+      <g transform="translate(0, 155)">
+        <rect width="105" height="22" rx="11" fill="#00E676" fill-opacity="0.15" stroke="#00E676" stroke-width="1"/>
+        <text x="12" y="15" font-family="'Outfit', sans-serif" font-size="10" font-weight="700" fill="#00E676">0% РАССРОЧКА</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- CARD 3: Profession Choice -->
+  <g transform="translate(510, 68)">
+    <rect width="220" height="225" rx="14" fill="url(#cardGrad)" stroke="#262838" stroke-width="1"/>
+    <rect x="0" y="0" width="220" height="3" rx="1.5" fill="url(#redAccent)"/>
+    
+    <g transform="translate(18, 22)">
+      <text x="0" y="0" class="card-tag">ВЫБОР СПЕЦИАЛЬНОСТИ</text>
+      
+      <!-- Problem -->
+      <g transform="translate(0, 22)">
+        <text x="0" y="0" class="card-strike">✕ Страх ошибиться с треком</text>
+      </g>
+      
+      <!-- Arrow down -->
+      <path d="M10 32 L10 46 M6 42 L10 47 L14 42" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- Solution -->
+      <g transform="translate(0, 66)">
+        <rect x="-4" y="-14" width="190" height="28" rx="6" fill="#00E676" fill-opacity="0.12"/>
+        <text x="6" y="5" class="card-solution">AI &amp; ТЕСТ КУРАТОРА</text>
+      </g>
+
+      <!-- Description -->
+      <text x="0" y="105" class="card-desc">
+        <tspan x="0" dy="0">Бесплатный подбор: IT,</tspan>
+        <tspan x="0" dy="16">управление, дизайн или</tspan>
+        <tspan x="0" dy="16">право за 15 минут.</tspan>
+      </text>
+
+      <g transform="translate(0, 155)">
+        <rect width="115" height="22" rx="11" fill="#00E676" fill-opacity="0.15" stroke="#00E676" stroke-width="1"/>
+        <text x="12" y="15" font-family="'Outfit', sans-serif" font-size="10" font-weight="700" fill="#00E676">ТОЧНЫЙ ПОДБОР</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- CARD 4: Bureaucracy &amp; Queues -->
+  <g transform="translate(750, 68)">
+    <rect width="220" height="225" rx="14" fill="url(#cardGrad)" stroke="#262838" stroke-width="1"/>
+    <rect x="0" y="0" width="220" height="3" rx="1.5" fill="url(#redAccent)"/>
+    
+    <g transform="translate(18, 22)">
+      <text x="0" y="0" class="card-tag">БЮРОКРАТИЯ И ОЧЕРЕДИ</text>
+      
+      <!-- Problem -->
+      <g transform="translate(0, 22)">
+        <text x="0" y="0" class="card-strike">✕ Очереди и риск ошибок</text>
+      </g>
+      
+      <!-- Arrow down -->
+      <path d="M10 32 L10 46 M6 42 L10 47 L14 42" stroke="#00E676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      
+      <!-- Solution -->
+      <g transform="translate(0, 66)">
+        <rect x="-4" y="-14" width="190" height="28" rx="6" fill="#00E676" fill-opacity="0.12"/>
+        <text x="6" y="5" class="card-solution">ОНЛАЙН ЗА 20 МИНУТ</text>
+      </g>
+
+      <!-- Description -->
+      <text x="0" y="105" class="card-desc">
+        <tspan x="0" dy="0">Куратор Максим Лунгу</tspan>
+        <tspan x="0" dy="16">лично ведет документы и</tspan>
+        <tspan x="0" dy="16">бронирует приказ.</tspan>
+      </text>
+
+      <g transform="translate(0, 155)">
+        <rect width="120" height="22" rx="11" fill="#00E676" fill-opacity="0.15" stroke="#00E676" stroke-width="1"/>
+        <text x="12" y="15" font-family="'Outfit', sans-serif" font-size="10" font-weight="700" fill="#00E676">БЕЗ ОЧЕРЕДЕЙ ⚡</text>
+      </g>
+    </g>
+  </g>
+</svg>

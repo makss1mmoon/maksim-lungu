@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgL" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10121D"/>
+      <stop offset="100%" stop-color="#141724"/>
+    </linearGradient>
+    <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF1744"/>
+      <stop offset="50%" stop-color="#7C4DFF"/>
+      <stop offset="100%" stop-color="#00E676"/>
+    </linearGradient>
+    <filter id="glowCircle" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <style>
+    .dash-head { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 2px; fill: #8E92A8; text-transform: uppercase; }
+    .loop-center { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 13px; font-weight: 900; fill: #FFF; letter-spacing: 1px; }
+    .loop-node { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 11px; font-weight: 800; fill: #FFF; }
+    .loop-desc { font-family: 'Inter', 'Segoe UI', sans-serif; font-size: 9.5px; fill: #9E9EB2; }
+    .sched-day { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 13px; font-weight: 800; fill: #FFF; }
+    .sched-tag { font-family: 'Outfit', 'Segoe UI', sans-serif; font-size: 10px; font-weight: 800; }
+    .sched-desc { font-family: 'Inter', 'Segoe UI', sans-serif; font-size: 11px; fill: #B3B7CE; }
+  </style>
+
+  <rect width="960" height="300" rx="18" fill="url(#bgL)" stroke="#232638" stroke-width="1.5"/>
+
+  <!-- LEFT PANEL: Closed-Loop 360 Ecosystem -->
+  <g transform="translate(30, 24)">
+    <text x="0" y="10" class="dash-head">ЕДИНЫЙ ЗАМКНУТЫЙ КОНТУР ОБУЧЕНИЯ</text>
+
+    <!-- Circular Orbit Visual -->
+    <g transform="translate(195, 138)">
+      <!-- Outer Orbit Ring -->
+      <circle cx="0" cy="0" r="100" fill="none" stroke="#25283C" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <!-- Glowing Active Arc -->
+      <path d="M -100 0 A 100 100 0 0 1 0 -100" fill="none" stroke="url(#orbitGrad)" stroke-width="3" filter="url(#glowCircle)"/>
+      <path d="M 0 -100 A 100 100 0 0 1 100 0" fill="none" stroke="url(#orbitGrad)" stroke-width="3" filter="url(#glowCircle)"/>
+
+      <!-- Center Hub -->
+      <circle cx="0" cy="0" r="42" fill="#181A2A" stroke="#FF1744" stroke-width="1.5"/>
+      <text x="0" y="-4" text-anchor="middle" class="loop-center">СИНЕРГИЯ</text>
+      <text x="0" y="12" text-anchor="middle" font-family="'Outfit', sans-serif" font-size="9" font-weight="700" fill="#FF5252">ЭКОСИСТЕМА</text>
+
+      <!-- Node 1: Top (Колледж и Вуз) -->
+      <g transform="translate(0, -100)">
+        <circle cx="0" cy="0" r="26" fill="#151726" stroke="#00E676" stroke-width="1.5"/>
+        <text x="0" y="4" text-anchor="middle" font-size="14">🎓</text>
+        <text x="0" y="-34" text-anchor="middle" class="loop-node">Колледж + Вуз</text>
+      </g>
+
+      <!-- Node 2: Right (Конструкторское бюро) -->
+      <g transform="translate(100, 0)">
+        <circle cx="0" cy="0" r="26" fill="#151726" stroke="#7C4DFF" stroke-width="1.5"/>
+        <text x="0" y="4" text-anchor="middle" font-size="14">⚙️</text>
+        <text x="36" y="4" class="loop-node">КБ и Лаборатории</text>
+      </g>
+
+      <!-- Node 3: Bottom (650+ Партнеров) -->
+      <g transform="translate(0, 100)">
+        <circle cx="0" cy="0" r="26" fill="#151726" stroke="#00B0FF" stroke-width="1.5"/>
+        <text x="0" y="4" text-anchor="middle" font-size="14">🏢</text>
+        <text x="0" y="38" text-anchor="middle" class="loop-node">650+ Партнеров</text>
+      </g>
+
+      <!-- Node 4: Left (Оффер и Зарплата) -->
+      <g transform="translate(-100, 0)">
+        <circle cx="0" cy="0" r="26" fill="#151726" stroke="#FF1744" stroke-width="1.5"/>
+        <text x="0" y="4" text-anchor="middle" font-size="14">💼</text>
+        <text x="-36" y="4" text-anchor="end" class="loop-node">Оффер и Доход</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Vertical Divider -->
+  <line x1="475" y1="24" x2="475" y2="276" stroke="#25283C" stroke-width="1" stroke-dasharray="6 6"/>
+
+  <!-- RIGHT PANEL: Flexible Weekly Schedule -->
+  <g transform="translate(505, 24)">
+    <text x="0" y="10" class="dash-head">ГИБКИЙ ГРАФИК СОВМЕЩЕНИЯ (РАБОТА + УЧЕБА)</text>
+
+    <!-- Schedule Item 1: Mon-Wed (Study) -->
+    <g transform="translate(0, 28)">
+      <rect width="425" height="62" rx="10" fill="#171928" stroke="#2B2E42" stroke-width="1"/>
+      <rect x="0" y="0" width="4" height="62" rx="2" fill="#00E676"/>
+      <g transform="translate(18, 18)">
+        <text x="0" y="0" class="sched-day">ПН — СР</text>
+        <g transform="translate(85, -12)">
+          <rect width="165" height="20" rx="10" fill="#00E676" fill-opacity="0.15"/>
+          <text x="10" y="14" class="sched-tag" fill="#00E676">ДИСТАНЦИОННЫЙ ТРЕК</text>
+        </g>
+        <text x="0" y="24" class="sched-desc">Онлайн-вебинары, лекции 24/7 в записи, тесты в удобный час</text>
+      </g>
+    </g>
+
+    <!-- Schedule Item 2: Thu-Sat (Work) -->
+    <g transform="translate(0, 100)">
+      <rect width="425" height="62" rx="10" fill="#171928" stroke="#2B2E42" stroke-width="1"/>
+      <rect x="0" y="0" width="4" height="62" rx="2" fill="#FF1744"/>
+      <g transform="translate(18, 18)">
+        <text x="0" y="0" class="sched-day">ЧТ — СБ</text>
+        <g transform="translate(85, -12)">
+          <rect width="205" height="20" rx="10" fill="#FF1744" fill-opacity="0.15"/>
+          <text x="10" y="14" class="sched-tag" fill="#FF5252">ОПЛАЧИВАЕМАЯ СТАЖИРОВКА</text>
+        </g>
+        <text x="0" y="24" class="sched-desc">Работа в IT-компании или у партнеров с официальной зарплатой</text>
+      </g>
+    </g>
+
+    <!-- Schedule Item 3: Sun (Rest) -->
+    <g transform="translate(0, 172)">
+      <rect width="425" height="46" rx="10" fill="#141624" stroke="#232638" stroke-width="1"/>
+      <rect x="0" y="0" width="4" height="46" rx="2" fill="#7C4DFF"/>
+      <g transform="translate(18, 16)">
+        <text x="0" y="0" class="sched-day">ВС</text>
+        <g transform="translate(50, -11)">
+          <rect width="130" height="18" rx="9" fill="#7C4DFF" fill-opacity="0.15"/>
+          <text x="10" y="13" class="sched-tag" fill="#B388FF">ЛИЧНОЕ ВРЕМЯ</text>
+        </g>
+        <text x="195" y="4" class="sched-desc">Отдых, спорт и хобби</text>
+      </g>
+    </g>
+
+    <!-- Bottom summary pill -->
+    <g transform="translate(0, 230)">
+      <rect width="425" height="26" rx="13" fill="#00E676" fill-opacity="0.1" stroke="#00E676" stroke-opacity="0.3" stroke-width="0.8"/>
+      <text x="24" y="17" font-family="'Outfit', sans-serif" font-size="11" font-weight="700" fill="#00E676">
+        ⚡ Зарплата + Диплом государственного образца одновременно
+      </text>
+    </g>
+  </g>
+</svg>
