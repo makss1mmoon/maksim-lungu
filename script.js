@@ -8,7 +8,7 @@
 const CONFIG = {
   managerName: "Максим Лунгу",
   telegramUsername: "mss44zak",
-  googleSheetWebhookUrl: "https://script.google.com/macros/s/AKfycbynSIddR2zkRp1huk7OzN2QhO-eSQyDzhc2m16za89U59p3rLiBbDj5fEBSZOsreml3/exec"
+  googleSheetWebhookUrl: "https://script.google.com/macros/s/AKfycbx-rRZjjGRkn3HxybKTJxpONNn6VD-40v5Cs9G99AvBzpUxZCalabIqlio7Ni3exXE3_A/exec"
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -110,6 +110,10 @@ function initModal() {
     if (formView) formView.classList.add('active');
     if (successView) successView.classList.remove('active');
 
+    // Anti-Bot: запоминаем время открытия формы (time-trap)
+    const formLoadTimeInput = document.getElementById('formLoadTime');
+    if (formLoadTimeInput) formLoadTimeInput.value = Date.now().toString();
+
     // Focus first input
     setTimeout(() => {
       if (nameInput) nameInput.focus();
@@ -200,7 +204,7 @@ function initPhoneMask() {
   });
 }
 
-/* --- 5. FORM SUBMISSION & CRM INTEGRATION --- */
+/* --- 5. FORM SUBMISSION & CRM INTEGRATION (С АНТИ-БОТ ЗАЩИТОЙ) --- */
 function initFormSubmission() {
   const form = document.getElementById('consultationForm');
   const nameInput = document.getElementById('userName');
@@ -213,23 +217,137 @@ function initFormSubmission() {
 
   if (!form) return;
 
+  // ==========================================
+  // ANTI-BOT: Rate Limiter (макс. 3 заявки за 10 минут)
+  // ==========================================
+  const RATE_LIMIT_MAX = 3;
+  const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 минут
+
+  function isRateLimited() {
+    try {
+      const history = JSON.parse(localStorage.getItem('_crm_submit_times') || '[]');
+      const now = Date.now();
+      const recent = history.filter(ts => (now - ts) < RATE_LIMIT_WINDOW_MS);
+      localStorage.setItem('_crm_submit_times', JSON.stringify(recent));
+      return recent.length >= RATE_LIMIT_MAX;
+    } catch { return false; }
+  }
+
+  function recordSubmission() {
+    try {
+      const history = JSON.parse(localStorage.getItem('_crm_submit_times') || '[]');
+      history.push(Date.now());
+      localStorage.setItem('_crm_submit_times', JSON.stringify(history.slice(-20)));
+    } catch {}
+  }
+
+  // ==========================================
+  // ANTI-BOT: Time-Trap (форма заполнена < 3 сек = бот)
+  // ==========================================
+  const MIN_FILL_TIME_MS = 3000;
+
+  function isTooFast() {
+    const loadTimeEl = document.getElementById('formLoadTime');
+    if (!loadTimeEl || !loadTimeEl.value) return false;
+    const elapsed = Date.now() - parseInt(loadTimeEl.value, 10);
+    return elapsed < MIN_FILL_TIME_MS;
+  }
+
+  // ==========================================
+  // ANTI-BOT: Honeypot check
+  // ==========================================
+  function isHoneypotFilled() {
+    const honeypot = document.getElementById('websiteUrl');
+    return honeypot && honeypot.value.length > 0;
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    // ---- ANTI-BOT CHECKS ----
+    // 1. Honeypot: скрытое поле заполнено → бот
+    if (isHoneypotFilled()) {
+      console.warn('🛡️ Honeypot triggered — submission blocked.');
+      // Имитируем успех, чтобы бот не понял что заблокирован
+      if (formView && successView) {
+        formView.classList.remove('active');
+        successView.classList.add('active');
+      }
+      return;
+    }
+
+    // 2. Time-trap: слишком быстро → бот
+    if (isTooFast()) {
+      console.warn('🛡️ Time-trap triggered — submission blocked.');
+      if (formView && successView) {
+        formView.classList.remove('active');
+        successView.classList.add('active');
+      }
+      return;
+    }
+
+    // 3. Rate-limit: слишком много заявок подряд
+    if (isRateLimited()) {
+      if (phoneError) phoneError.textContent = 'Слишком много заявок. Попробуйте через 10 минут.';
+      return;
+    }
+
     let isValid = true;
+    // Очищаем все ошибки
+    const surnameError = document.getElementById('surnameError');
+    const birthdateError = document.getElementById('birthdateError');
     if (nameError) nameError.textContent = '';
     if (phoneError) phoneError.textContent = '';
+    if (surnameError) surnameError.textContent = '';
+    if (birthdateError) birthdateError.textContent = '';
 
+    // Считываем поля
+    const surnameInput = document.getElementById('userSurname');
+    const patronymicInput = document.getElementById('userPatronymic');
+    const birthdateInput = document.getElementById('userBirthdate');
+    const telegramInput = document.getElementById('userTelegram');
+
+    const surnameVal = surnameInput ? surnameInput.value.trim() : '';
     const nameVal = nameInput.value.trim();
+    const patronymicVal = patronymicInput ? patronymicInput.value.trim() : '';
+    const birthdateVal = birthdateInput ? birthdateInput.value : '';
     const phoneVal = phoneInput.value.trim();
     const phoneDigits = phoneVal.replace(/\D/g, '');
+    const telegramVal = telegramInput ? telegramInput.value.trim() : '';
 
-    if (!nameVal) {
-      if (nameError) nameError.textContent = 'Пожалуйста, укажите ваше имя';
-      nameInput.focus();
+    // Валидация: только буквы, пробелы, дефисы
+    const nameRegex = /^[a-zA-Zа-яА-ЯёЁ\s\-]{2,60}$/;
+
+    // Фамилия (обязательна)
+    if (!surnameVal) {
+      if (surnameError) surnameError.textContent = 'Пожалуйста, укажите фамилию';
+      if (surnameInput) surnameInput.focus();
+      isValid = false;
+    } else if (!nameRegex.test(surnameVal)) {
+      if (surnameError) surnameError.textContent = 'Фамилия может содержать только буквы';
+      if (surnameInput) surnameInput.focus();
       isValid = false;
     }
 
+    // Имя (обязательно)
+    if (!nameVal) {
+      if (nameError) nameError.textContent = 'Пожалуйста, укажите имя';
+      if (isValid) nameInput.focus();
+      isValid = false;
+    } else if (!nameRegex.test(nameVal)) {
+      if (nameError) nameError.textContent = 'Имя может содержать только буквы';
+      if (isValid) nameInput.focus();
+      isValid = false;
+    }
+
+    // Дата рождения (обязательна)
+    if (!birthdateVal) {
+      if (birthdateError) birthdateError.textContent = 'Укажите дату рождения';
+      if (isValid && birthdateInput) birthdateInput.focus();
+      isValid = false;
+    }
+
+    // Телефон
     if (!phoneVal || phoneDigits.length < 11) {
       if (phoneError) phoneError.textContent = 'Укажите корректный номер телефона (11 цифр)';
       if (isValid) phoneInput.focus();
@@ -248,6 +366,10 @@ function initFormSubmission() {
     const institutionVal = document.getElementById('userInstitution')?.value || '«Синергия»';
     const facultyVal = document.getElementById('userFaculty')?.value || 'IT, разработка и ИИ';
 
+    // Собираем полное ФИО
+    let fullName = surnameVal + ' ' + nameVal;
+    if (patronymicVal) fullName += ' ' + patronymicVal;
+
     // Форматируем телефон в чистый вид 8XXXXXXXXXX (11 цифр)
     let digits = phoneVal.replace(/\D/g, '');
     let formattedPhone = digits;
@@ -257,18 +379,32 @@ function initFormSubmission() {
       formattedPhone = '8' + digits;
     }
 
-    // Lead Payload
+    // Чистим Telegram username
+    let cleanTelegram = telegramVal.replace(/^@/, '').trim();
+
+    // Lead Payload (с анти-бот метаданными)
     const payload = {
-      name: nameVal,
+      name: fullName,
+      surname: surnameVal,
+      firstName: nameVal,
+      patronymic: patronymicVal,
+      birthdate: birthdateVal,
       phone: formattedPhone,
+      telegram: cleanTelegram,
       level: levelVal,
       institution: institutionVal,
       faculty: facultyVal,
       source: "Запись на консультацию",
       notes: `${levelVal} • ${institutionVal} • ${facultyVal}`,
       url: window.location.href,
-      submittedAt: new Date().toISOString()
+      submittedAt: new Date().toISOString(),
+      // Anti-bot metadata для серверной проверки
+      _hp: document.getElementById('websiteUrl')?.value || '',
+      _ft: document.getElementById('formLoadTime')?.value || ''
     };
+
+    // Фиксируем отправку в rate-limiter
+    recordSubmission();
 
     // Сохраняем локально в браузере (резервная копия на случай сбоя сети)
     try {
