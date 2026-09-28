@@ -1434,6 +1434,25 @@ button {
   min-height: 1em;
 }
 
+.field-optional {
+  font-weight: 400;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--c-meta);
+  font-size: 0.7rem;
+}
+
+.field-input[type="date"] {
+  cursor: pointer;
+  color: var(--c-black);
+}
+
+.field-input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.3);
+}
+
 /* Pill selector buttons for Level & Institution */
 .form-pill-group {
   display: flex;

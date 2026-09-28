@@ -435,13 +435,14 @@
 
         <form class="editorial-form" id="consultationForm" novalidate>
           
-          <!-- Выбор уровня обучения (Колледж / Вуз) -->
+          <!-- Выбор уровня обучения (Колледж / Вуз / Курсы) -->
           <div class="form-field">
             <label class="field-label">Куда планируете поступать?</label>
             <div class="form-pill-group" id="levelPills">
               <button type="button" class="form-pill active" data-value="Вуз (Бакалавриат)">Вуз (Бакалавриат)</button>
               <button type="button" class="form-pill" data-value="Колледж (9-11 кл.)">Колледж (9-11 кл.)</button>
               <button type="button" class="form-pill" data-value="Магистратура">Магистратура</button>
+              <button type="button" class="form-pill" data-value="Курсы">Курсы</button>
               <button type="button" class="form-pill" data-value="Пока не знаю">Пока не знаю</button>
             </div>
             <input type="hidden" id="userLevel" name="userLevel" value="Вуз (Бакалавриат)">
@@ -478,11 +479,31 @@
             </div>
           </div>
 
+          <!-- Фамилия -->
+          <div class="form-field">
+            <label for="userSurname" class="field-label">Фамилия</label>
+            <input type="text" id="userSurname" name="userSurname" class="field-input" placeholder="Иванов" required autocomplete="family-name">
+            <span class="field-error" id="surnameError"></span>
+          </div>
+
           <!-- Имя -->
           <div class="form-field">
-            <label for="userName" class="field-label">Как вас зовут?</label>
-            <input type="text" id="userName" name="userName" class="field-input" placeholder="Имя или как к вам обращаться" required autocomplete="name">
+            <label for="userName" class="field-label">Имя</label>
+            <input type="text" id="userName" name="userName" class="field-input" placeholder="Иван" required autocomplete="given-name">
             <span class="field-error" id="nameError"></span>
+          </div>
+
+          <!-- Отчество (необязательное) -->
+          <div class="form-field">
+            <label for="userPatronymic" class="field-label">Отчество <span class="field-optional">(если есть)</span></label>
+            <input type="text" id="userPatronymic" name="userPatronymic" class="field-input" placeholder="Иванович" autocomplete="additional-name">
+          </div>
+
+          <!-- Дата рождения -->
+          <div class="form-field">
+            <label for="userBirthdate" class="field-label">Дата рождения</label>
+            <input type="date" id="userBirthdate" name="userBirthdate" class="field-input" required>
+            <span class="field-error" id="birthdateError"></span>
           </div>
 
           <!-- Телефон -->
@@ -491,6 +512,20 @@
             <input type="tel" id="userPhone" name="userPhone" class="field-input" placeholder="+7 (___) ___-__-__" required autocomplete="tel">
             <span class="field-error" id="phoneError"></span>
           </div>
+
+          <!-- Telegram -->
+          <div class="form-field">
+            <label for="userTelegram" class="field-label">Telegram <span class="field-optional">(необязательно)</span></label>
+            <input type="text" id="userTelegram" name="userTelegram" class="field-input" placeholder="@username" autocomplete="off">
+          </div>
+
+          <!-- Anti-Bot: Honeypot (скрытое поле — боты заполнят, люди нет) -->
+          <div style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden;" aria-hidden="true" tabindex="-1">
+            <label for="websiteUrl">Оставьте это поле пустым</label>
+            <input type="text" id="websiteUrl" name="websiteUrl" value="" autocomplete="off" tabindex="-1">
+          </div>
+          <!-- Anti-Bot: Time-Trap (запоминаем время открытия формы) -->
+          <input type="hidden" id="formLoadTime" name="formLoadTime" value="">
 
           <button type="submit" class="btn-editorial btn-form-submit" id="submitBtn">
             <span class="btn-text">ОТПРАВИТЬ ЗАЯВКУ</span>
