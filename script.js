@@ -8,7 +8,7 @@
 const CONFIG = {
   managerName: "Максим Лунгу",
   telegramUsername: "mss44zak",
-  googleSheetWebhookUrl: "https://script.google.com/macros/s/AKfycbx-rRZjjGRkn3HxybKTJxpONNn6VD-40v5Cs9G99AvBzpUxZCalabIqlio7Ni3exXE3_A/exec"
+  googleSheetWebhookUrl: "https://script.google.com/macros/s/AKfycbzgneJ7kdEoJmbc_gmZfr4JOZjV5y2RuE2deh26ObsgdOkaJtYwTc1pW1xaR_3WhqWC/exec"
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -218,10 +218,10 @@ function initFormSubmission() {
   if (!form) return;
 
   // ==========================================
-  // ANTI-BOT: Rate Limiter (макс. 3 заявки за 10 минут)
+  // ANTI-BOT: Rate Limiter & Time-Trap (мягкие пороги, чтобы не мешать тестированию)
   // ==========================================
-  const RATE_LIMIT_MAX = 3;
-  const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 минут
+  const RATE_LIMIT_MAX = 50; // не блокируем тестирование владельцем
+  const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 
   function isRateLimited() {
     try {
@@ -237,20 +237,17 @@ function initFormSubmission() {
     try {
       const history = JSON.parse(localStorage.getItem('_crm_submit_times') || '[]');
       history.push(Date.now());
-      localStorage.setItem('_crm_submit_times', JSON.stringify(history.slice(-20)));
+      localStorage.setItem('_crm_submit_times', JSON.stringify(history.slice(-50)));
     } catch {}
   }
 
-  // ==========================================
-  // ANTI-BOT: Time-Trap (форма заполнена < 3 сек = бот)
-  // ==========================================
-  const MIN_FILL_TIME_MS = 3000;
+  const MIN_FILL_TIME_MS = 400; // боты шлют за 0-100мс, человек тратит от 1-2 сек
 
   function isTooFast() {
     const loadTimeEl = document.getElementById('formLoadTime');
     if (!loadTimeEl || !loadTimeEl.value) return false;
     const elapsed = Date.now() - parseInt(loadTimeEl.value, 10);
-    return elapsed < MIN_FILL_TIME_MS;
+    return elapsed > 0 && elapsed < MIN_FILL_TIME_MS;
   }
 
   // ==========================================
@@ -315,41 +312,34 @@ function initFormSubmission() {
     const phoneDigits = phoneVal.replace(/\D/g, '');
     const telegramVal = telegramInput ? telegramInput.value.trim() : '';
 
-    // Валидация: только буквы, пробелы, дефисы
-    const nameRegex = /^[a-zA-Zа-яА-ЯёЁ\s\-]{2,60}$/;
+    // Валидация: буквы, дефисы (от 1 буквы для тестов)
+    const nameRegex = /^[a-zA-Zа-яА-ЯёЁ\s\-]{1,60}$/;
 
-    // Фамилия (обязательна)
-    if (!surnameVal) {
+    // Фамилия
+    if (!surnameVal && !nameVal) {
       if (surnameError) surnameError.textContent = 'Пожалуйста, укажите фамилию';
       if (surnameInput) surnameInput.focus();
       isValid = false;
-    } else if (!nameRegex.test(surnameVal)) {
+    } else if (surnameVal && !nameRegex.test(surnameVal)) {
       if (surnameError) surnameError.textContent = 'Фамилия может содержать только буквы';
       if (surnameInput) surnameInput.focus();
       isValid = false;
     }
 
-    // Имя (обязательно)
-    if (!nameVal) {
+    // Имя
+    if (!nameVal && !surnameVal) {
       if (nameError) nameError.textContent = 'Пожалуйста, укажите имя';
       if (isValid) nameInput.focus();
       isValid = false;
-    } else if (!nameRegex.test(nameVal)) {
+    } else if (nameVal && !nameRegex.test(nameVal)) {
       if (nameError) nameError.textContent = 'Имя может содержать только буквы';
       if (isValid) nameInput.focus();
       isValid = false;
     }
 
-    // Дата рождения (обязательна)
-    if (!birthdateVal) {
-      if (birthdateError) birthdateError.textContent = 'Укажите дату рождения';
-      if (isValid && birthdateInput) birthdateInput.focus();
-      isValid = false;
-    }
-
     // Телефон
-    if (!phoneVal || phoneDigits.length < 11) {
-      if (phoneError) phoneError.textContent = 'Укажите корректный номер телефона (11 цифр)';
+    if (!phoneVal || phoneDigits.length < 10) {
+      if (phoneError) phoneError.textContent = 'Укажите корректный номер телефона (от 10 цифр)';
       if (isValid) phoneInput.focus();
       isValid = false;
     }

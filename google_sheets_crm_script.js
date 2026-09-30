@@ -30,9 +30,7 @@ function doPost(e) {
       }
     }
 
-    // ========================================================================
-    // ПАРСИНГ ДАННЫХ АБИТУРИЕНТА
-    // ========================================================================
+    // 3. ПАРСИНГ ДАННЫХ АБИТУРИЕНТА
     var clientFullName = (data.name || "").trim();
     var clientSurname = (data.surname || "").trim();
     var clientFirstName = (data.firstName || "").trim();
@@ -45,26 +43,35 @@ function doPost(e) {
     var clientFaculty = (data.faculty || "IT, разработка и ИИ").trim();
     var clientNotes = data.notes || "";
 
-    // 3. ВАЛИДАЦИЯ: имя должно содержать только буквы (2-60 символов)
-    var nameRegex = /^[a-zA-Zа-яА-ЯёЁ\s\-]{2,60}$/;
-    if (!clientFirstName || !nameRegex.test(clientFirstName)) {
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: "error", message: "Некорректное имя" }))
-        .setMimeType(ContentService.MimeType.JSON);
+    // Умный парсинг имени: если пришло только ФИО целиком (или имя пустое)
+    if (!clientFirstName && clientFullName) {
+      var nameParts = clientFullName.split(/\s+/);
+      if (nameParts.length === 1) {
+        clientFirstName = nameParts[0];
+      } else if (nameParts.length >= 2) {
+        if (!clientSurname) clientSurname = nameParts[0];
+        clientFirstName = nameParts[1];
+        if (nameParts.length >= 3 && !clientPatronymic) {
+          clientPatronymic = nameParts.slice(2).join(" ");
+        }
+      }
+    }
+    if (!clientFirstName) {
+      clientFirstName = clientSurname || clientFullName || "Абитуриент";
     }
 
-    // 4. ВАЛИДАЦИЯ: телефон — 10-15 цифр
+    // ВАЛИДАЦИЯ: телефон — минимум 10 цифр
     var phoneDigitsOnly = String(clientPhone).replace(/\D/g, '');
-    if (phoneDigitsOnly.length < 10 || phoneDigitsOnly.length > 15) {
+    if (phoneDigitsOnly.length < 10) {
       return ContentService
         .createTextOutput(JSON.stringify({ status: "error", message: "Некорректный телефон" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 
-    // Форматируем дату рождения в dd.MM.yyyy (если пришла в ISO)
+    // Форматируем дату рождения в dd.MM.yyyy (если пришла в ISO YYYY-MM-DD)
     var formattedBirthdate = "—";
     if (clientBirthdate) {
-      var parts = clientBirthdate.split("-"); // YYYY-MM-DD
+      var parts = clientBirthdate.split("-");
       if (parts.length === 3) {
         formattedBirthdate = parts[2] + "." + parts[1] + "." + parts[0];
       } else {
@@ -85,15 +92,27 @@ function doPost(e) {
     // ------------------------------------------------------------------------
     var masterSheet = ss.getSheetByName("Все Лиды");
     if (!masterSheet) {
-      masterSheet = ss.insertSheet("Все Лиды", 0);
-      masterSheet.appendRow([
-        "№", "Дата", "Время",
-        "Фамилия", "Имя", "Отчество", "Дата рождения",
-        "Телефон", "Telegram",
-        "Уровень", "Вуз / Колледж", "Направление",
-        "Статус заявки", "Заметки куратора"
-      ]);
-      
+      var sheets = ss.getSheets();
+      // Если в таблице один лист и он пустой или с дефолтным именем — переименуем его
+      if (sheets.length === 1 && (sheets[0].getName() === "Лист 1" || sheets[0].getName() === "Sheet1") && sheets[0].getLastRow() <= 1) {
+        masterSheet = sheets[0];
+        masterSheet.setName("Все Лиды");
+      } else {
+        masterSheet = ss.insertSheet("Все Лиды", 0);
+      }
+    }
+
+    var masterHeaders = [
+      "№", "Дата", "Время",
+      "Фамилия", "Имя", "Отчество", "Дата рождения",
+      "Телефон", "Telegram",
+      "Уровень", "Вуз / Колледж", "Направление",
+      "Статус заявки", "Заметки куратора"
+    ];
+
+    // Автоматическое исправление шапки: если шапки нет или в ней старые колонки (< 14)
+    if (masterSheet.getLastRow() === 0 || masterSheet.getLastColumn() < 14) {
+      masterSheet.getRange(1, 1, 1, 14).setValues([masterHeaders]);
       var header = masterSheet.getRange(1, 1, 1, 14);
       header.setBackground("#D9381E");
       header.setFontColor("#FFFFFF");
@@ -104,22 +123,25 @@ function doPost(e) {
       masterSheet.setFrozenRows(1);
     }
 
-    // 5. ДУБЛИКАТЫ: блокируем повторную заявку с тем же телефоном (последние 20 записей)
+    // 4. ДУБЛИКАТЫ: если тот же телефон был отправлен за последние 20 строк — помечаем заметкой
+    var isDuplicate = false;
     var lastRow = masterSheet.getLastRow();
     if (lastRow > 1) {
       var recentRows = Math.min(lastRow - 1, 20);
       var recentData = masterSheet.getRange(lastRow - recentRows + 1, 8, recentRows, 1).getValues(); // Колонка H = Телефон
-      var normalizedNewPhone = "'8" + phoneDigitsOnly.slice(phoneDigitsOnly.length - 10);
+      var cleanNew = phoneDigitsOnly.slice(-10);
       
       for (var i = 0; i < recentData.length; i++) {
-        var existingPhone = String(recentData[i][0]).replace(/\D/g, '');
-        var newClean = normalizedNewPhone.replace(/\D/g, '');
-        if (existingPhone === newClean && existingPhone.length >= 10) {
-          return ContentService
-            .createTextOutput(JSON.stringify({ status: "success", row: -1, note: "duplicate" }))
-            .setMimeType(ContentService.MimeType.JSON);
+        var existing = String(recentData[i][0]).replace(/\D/g, '').slice(-10);
+        if (existing && existing === cleanNew) {
+          isDuplicate = true;
+          break;
         }
       }
+    }
+
+    if (isDuplicate) {
+      clientNotes = (clientNotes ? clientNotes + " • " : "") + "⚠️ Повторный запрос";
     }
 
     var nextId = Math.max(1, masterSheet.getLastRow());
@@ -175,12 +197,16 @@ function doPost(e) {
     var daySheet = ss.getSheetByName(daySheetName);
     if (!daySheet) {
       daySheet = ss.insertSheet(daySheetName, 1);
-      daySheet.appendRow([
-        "Время", "Фамилия", "Имя", "Отчество", "Дата рождения",
-        "Телефон", "Telegram", "Уровень", "Вуз / Колледж", "Направление",
-        "Статус", "Заметки"
-      ]);
-      
+    }
+
+    var dayHeaders = [
+      "Время", "Фамилия", "Имя", "Отчество", "Дата рождения",
+      "Телефон", "Telegram", "Уровень", "Вуз / Колледж", "Направление",
+      "Статус", "Заметки"
+    ];
+
+    if (daySheet.getLastRow() === 0 || daySheet.getLastColumn() < 12) {
+      daySheet.getRange(1, 1, 1, 12).setValues([dayHeaders]);
       var dayHeader = daySheet.getRange(1, 1, 1, 12);
       dayHeader.setBackground("#222222");
       dayHeader.setFontColor("#FFFFFF");
